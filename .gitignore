@@ -1,0 +1,4 @@
+spotify
+engine
+*.o
+node_modules

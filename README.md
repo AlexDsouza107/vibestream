@@ -8,6 +8,8 @@ A music player written for a Data Structures mini project. It demonstrates **Mod
 
 Current version: **v1.2.0** (see [Versions](#versions)).
 
+**Team manual:** [`docs/VibeStream-Manual.pdf`](docs/VibeStream-Manual.pdf) explains the concepts, every feature and the code, file by file.
+
 ## Build and run
 
 ```

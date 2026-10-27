@@ -13,7 +13,7 @@ const P = (d) => '<svg viewBox="0 0 24 24"><path d="' + d + '"/></svg>';
 const S = (d) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="' + d + '"/></svg>';
 const HEART = 'M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z';
 const ICONS = {
-  logo: '<svg viewBox="0 0 32 32"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9d7bff"/><stop offset="1" stop-color="#ff6ad5"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#lg)"/><path d="M6 18q2.2-7 4.4 0t4.4 0 4.4-9 4.4 9 2.4 0" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  logo: '<svg viewBox="0 0 32 32"><path d="M3 17q3-9 6 0t6 0 6-11 6 11 3 0" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   home: P('M12 2.7 2 10.4V22h7.5v-6.5h5V22H22V10.4z'),
   heart: P(HEART), 'heart-o': S(HEART),
   search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>',
@@ -41,8 +41,8 @@ function iconBtn(name, cls, label) {
   return b;
 }
 const mmss = (s) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
-// song colours stay inside the app's violet / orchid / cyan family
-const HUES = [262, 318, 290, 205, 340, 240, 182, 305];
+// each song gets a muted, tonal colour (the CSS keeps saturation low)
+const HUES = [28, 205, 345, 160, 262, 42, 318, 218];
 const hue = (id) => HUES[(id - 1 + HUES.length * 100) % HUES.length];
 function cover(song, cls) {
   const c = el('div', 'cover ' + (cls || ''));
@@ -57,9 +57,9 @@ let toastTimer;
 function toast(msg, ok) {
   const t = $('toast');
   t.textContent = msg;
-  t.className = 'toast glass show' + (ok ? '' : ' bad');
+  t.className = 'toast show' + (ok ? '' : ' bad');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.className = 'toast glass' + (ok ? '' : ' bad'); }, 2300);
+  toastTimer = setTimeout(() => { t.className = 'toast' + (ok ? '' : ' bad'); }, 2300);
 }
 
 /* ---------- talking to the C engine ---------- */
@@ -106,7 +106,7 @@ function renderView() {
 
   const hero = el('div', 'hero');
   let big;
-  if (view === 'home') { big = cover({ id: 3, title: '♪' }, 'lg'); big.firstChild.textContent = '♪'; }
+  if (view === 'home') { big = cover({ id: 1, title: '♪' }, 'lg'); big.firstChild.textContent = '♪'; }
   else { big = el('div', 'cover lg liked-cover'); const h = el('span'); h.innerHTML = ico('heart'); h.style.fontSize = '80px'; big.append(h); }
   const txt = el('div');
   txt.append(el('div', 'kind', 'PLAYLIST'), el('h1', '', view === 'home' ? 'VibeStream Mix' : 'Liked Songs'));
@@ -117,7 +117,7 @@ function renderView() {
 
   const bar = el('div', 'toolbar');
   const listPlaying = playing && cur && list.some((s) => s.id === cur.id);
-  const bp = el('button', 'grad-btn');
+  const bp = el('button', 'btn-primary');
   bp.innerHTML = ico(listPlaying ? 'pause' : 'play') + '<span>' + (listPlaying ? 'Pause' : 'Play') + '</span>';
   bp.onclick = () => {
     if (listPlaying) togglePlay();
@@ -127,7 +127,7 @@ function renderView() {
   };
   bar.appendChild(bp);
   if (view === 'home') {
-    const add = el('button', 'glass-btn', '+ Add song');
+    const add = el('button', 'btn-ghost', '+ Add song');
     add.onclick = () => $('add-dialog').showModal();
     bar.appendChild(add);
   }
@@ -179,7 +179,7 @@ function renderView() {
 function renderPlayer() {
   const cur = current();
   // ambient background colour follows the song
-  document.body.style.setProperty('--amb', cur ? hue(cur.id) : 265);
+  document.body.style.setProperty('--amb', cur ? hue(cur.id) : 30);
 
   const left = $('p-left');
   left.replaceChildren();
@@ -189,7 +189,7 @@ function renderPlayer() {
     names.append(el('div', 't', cur.title), el('div', 'a', cur.artist));
     left.append(cover(cur), names);
   } else {
-    const c = el('div', 'cover'); c.style.setProperty('--h', 265); c.append(el('span', '', '♪'));
+    const c = el('div', 'cover'); c.style.setProperty('--h', 30); c.append(el('span', '', '♪'));
     const names = el('div');
     names.append(el('div', 't', 'Not playing'), el('div', 'a', 'Choose a song'));
     left.append(c, names);
@@ -203,7 +203,7 @@ function renderPlayer() {
   const art = $('np-art');
   art.className = 'cover np-art';
   art.replaceChildren(el('span', '', cur ? cur.title[0].toUpperCase() : '♪'));
-  art.style.setProperty('--h', cur ? hue(cur.id) : 265);
+  art.style.setProperty('--h', cur ? hue(cur.id) : 30);
   $('np-title').textContent = cur ? cur.title : 'Not playing';
   $('np-artist').textContent = cur ? cur.artist : 'Choose a song';
   const like = $('np-like');

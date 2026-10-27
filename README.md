@@ -1,8 +1,12 @@
 # VibeStream
 
-A menu-driven console music player in C99, written for a Data Structures mini project.
-It demonstrates **Module 2 (Stack and Queue)** and **Module 3 (Linked List)** only.
-There is no audio or GUI: "playing" a song prints `Now playing: <title> - <artist>`.
+A music player written for a Data Structures mini project. It demonstrates **Module 2 (Stack and Queue)** and
+**Module 3 (Linked List)** only, in two forms that share the same C data-structure code:
+
+- **Console app** (`./spotify`): a menu-driven C99 program. "Playing" a song just prints `Now playing: <title> - <artist>`.
+- **Web app** (`./run.sh`): a browser UI (shuffle, playlists, a reorderable queue, real audio from your own files) driven by a C engine.
+
+Current version: **v1.2.0** (see [Versions](#versions)).
 
 ## Build and run
 
@@ -24,6 +28,10 @@ make clean    # removes the binary and object files
 | 6 | "Play Next" (HIGH) vs normal (LOW) priority | Priority queue | 2 | `queue.c` |
 | 7 | Add to front or rear of the queue | Deque | 2 | `queue.c` |
 | 8 | Unlimited history and play queue (menu option 7 switches modes) | Stack and queue using linked lists | 2 + 3 | `stack.c`, `queue.c` |
+| 9 | *(web)* Playlists you create (add, remove, rename, delete) | One doubly linked list per playlist | 3 | `playlist.c`, `engine.c` |
+| 10 | *(web)* Shuffle | Fisher-Yates shuffle into a linked-list queue, consumed song by song | 2 + 3 | `engine.c`, `queue.c` |
+| 11 | *(web)* Up Next editor: remove a song, reorder, clear | Remove-at-index on the circular, priority, deque and linked queues | 2 + 3 | `queue.c`, `engine.c` |
+| 12 | *(web)* Playing from Liked Songs in order | Singly linked list with a play cursor | 3 | `liked.c` |
 
 ## Web app (optional front end)
 
@@ -38,7 +46,7 @@ The same C data structures also power a browser UI. The C program `engine` does 
 Requirements: `gcc`, `make`, and Node.js 18+. (`npm start` does the same as `./run.sh`; set `PORT=4000` to change the port.)
 
 ```
-Browser (web/index.html, style.css, app.js)
+Browser (web/index.html, style.css, app.js, meta.js)   <- also plays your audio files with an HTML5 <audio> element
    |  POST /api/cmd  {"cmd":"play"}
 Node server (server.js)
    |  one text command per line on stdin / one JSON line back
@@ -79,11 +87,24 @@ Other controls: click the player artwork for full-screen Now Playing; double-cli
 
 ## How playback works
 
-- **Play** picks the next song in this order: priority queue (HIGH before LOW), then deque (front first), then the play queue, then the next node of the playlist. The song is pushed onto the history stack.
+Console app:
+- **Play** takes the next song in this order: priority queue (HIGH before LOW), then deque (front first), then the play queue, then the next node of the playlist. The song is pushed onto the history stack.
 - **Previous** pops the top of history (the song that is playing now), then peeks at the one below it and plays that. The top of history is always the current song.
 - If the array history stack is full (10), the oldest entry is dropped so new songs keep being recorded.
 - Option 7 switches the history stack and play queue between array and linked-list versions, carrying the contents across (the array versions keep at most 10).
-- Memory: every node is `malloc`'d and everything is freed on exit.
+
+Web app: the same, except the last step plays from the *list you started from* (Mix, Liked Songs or a playlist), in order or
+shuffled, and everything in Up Next plays first.
+
+Memory: every node is `malloc`'d and everything is freed on exit (the engine is also checked with AddressSanitizer).
+
+## Versions
+
+| Version | Where | What it is |
+|---------|-------|------------|
+| v1.0.0 | tag on `main` | Console app plus the first web UI (glass / aurora look) |
+| v1.1 | branch `ui-redesign` | Restrained editorial UI |
+| **v1.2.0** | branch `v1.2` | Logo, shuffle, your own playlists, reorderable Up Next, local audio upload, obsidian liquid-glass UI with light/dark mode |
 
 ## Sample run
 

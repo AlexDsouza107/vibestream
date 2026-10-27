@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "liked.h"
 
-void liked_init(LikedList *l) { l->head = NULL; l->count = 0; }
+void liked_init(LikedList *l) { l->head = l->current = NULL; l->count = 0; }
 
 int liked_contains(const LikedList *l, int id) {
     for (LikedNode *c = l->head; c; c = c->next)
@@ -38,6 +38,7 @@ int liked_remove(LikedList *l, int id) {
     }
     if (!c) return 0;
     if (prev) prev->next = c->next; else l->head = c->next;
+    if (l->current == c) l->current = prev;       /* keep the cursor valid */
     free(c);
     l->count--;
     return 1;
@@ -52,6 +53,16 @@ void liked_display(const LikedList *l) {
         printf("\n");
     }
 }
+
+/* Singly linked list traversal: move the cursor one node forward. */
+const Song *liked_next(LikedList *l) {
+    LikedNode *n = l->current ? l->current->next : l->head;
+    if (!n) return NULL;
+    l->current = n;
+    return &n->song;
+}
+
+void liked_reset_cursor(LikedList *l) { l->current = NULL; }
 
 void liked_free(LikedList *l) {
     LikedNode *c = l->head;

@@ -3,90 +3,120 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#07060f">
+<meta name="theme-color" content="#0A0B10">
+<script>try{var _t=localStorage.getItem("vs-theme")}catch(e){}document.documentElement.dataset.theme=_t||(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark")</script>
 <title>VibeStream</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%239d7bff'/%3E%3Cstop offset='1' stop-color='%23ff6ad5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='url(%23g)'/%3E%3Cpath d='M7 18q2-6 4 0t4 0 4-8 4 8 2 0' stroke='%23fff' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
-
 <div class="app" id="app">
+
   <aside class="side glass">
-    <div class="brand"><span class="logo" data-icon="logo"></span>VibeStream</div>
-    <label class="search"><span data-icon="search"></span><input id="search" placeholder="Search" autocomplete="off" aria-label="Search your playlist"></label>
-    <nav class="nav">
-      <button class="nav-item active" data-view="home"><span data-icon="home"></span>Listen Now</button>
+    <div class="brand"><img class="logo" src="logo.png" alt="" width="34" height="34"><span class="wm"><b>Vibe</b>Stream</span></div>
+    <label class="search"><span data-icon="search"></span><input id="search" type="search" placeholder="Search" autocomplete="off" aria-label="Search your playlist"></label>
+    <nav class="nav" aria-label="Main">
+      <button class="nav-item active" data-view="home"><span data-icon="compass"></span>Listen Now</button>
       <button class="nav-item" data-view="liked"><span data-icon="heart"></span>Liked Songs</button>
-      <button class="nav-item" id="open-queue"><span data-icon="queue"></span>Up Next</button>
+      <button class="nav-item" id="open-queue"><span data-icon="list"></span>Up Next</button>
     </nav>
-    <div class="lib-label">Library</div>
-    <button class="lib-item" data-view="home"><div class="cover sm" style="--h:265"><span>♪</span></div><div><div class="lt">VibeStream Mix</div><div class="ls">Playlist</div></div></button>
-    <button class="lib-item" data-view="liked"><div class="cover sm liked-cover"><span data-icon="heart"></span></div><div><div class="lt">Liked Songs</div><div class="ls" id="lib-liked-count">Playlist</div></div></button>
+    <div class="lib-head"><div class="lib-label">Library</div><button class="icon-btn sm" id="new-list" aria-label="Create playlist" title="Create playlist" data-icon="plus"></button></div>
+    <div class="lib" id="lib"></div>
     <div class="side-foot"><button class="chip-btn" id="btn-mode"></button></div>
   </aside>
 
   <main class="main" id="main">
-    <div class="mnav">
-      <button class="chip-btn" data-view="home">Listen Now</button>
-      <button class="chip-btn" data-view="liked">Liked</button>
-    </div>
+    <div class="mesh" aria-hidden="true"></div>
+    <div class="stick glass" id="stick"><span class="stick-title" id="stick-title"></span><button class="theme-btn" id="theme-btn" aria-label="Switch light or dark theme"></button></div>
+    <div class="mnav" id="mnav"></div>
     <div class="view" id="view"></div>
   </main>
 
   <aside class="queue glass" id="queue-panel" aria-label="Up next">
-    <div class="q-head"><h3>Up Next</h3><button class="icon-btn" id="close-queue" aria-label="Close" data-icon="close"></button></div>
-    <div id="queue-body"></div>
+    <div class="q-head"><h3>Up Next</h3><button class="icon-btn" id="close-queue" aria-label="Close Up Next" data-icon="close"></button></div>
+    <div id="queue-body" class="q-scroll"></div>
   </aside>
 
   <footer class="player glass" id="player">
     <button class="p-left" id="p-left" aria-label="Open Now Playing"></button>
     <div class="p-center">
       <div class="p-controls">
-        <button class="icon-btn" id="b-repeat" aria-label="Repeat" data-icon="repeat"></button>
+        <button class="icon-btn" id="b-shuffle" aria-label="Shuffle" aria-pressed="false" data-icon="shuffle"></button>
+        <button class="icon-btn" id="b-repeat" aria-label="Repeat all" data-icon="repeat"></button>
         <button class="icon-btn" id="b-prev" aria-label="Previous" data-icon="prev"></button>
         <button class="play-btn" id="b-play" aria-label="Play"></button>
         <button class="icon-btn" id="b-next" aria-label="Next" data-icon="next"></button>
-        <button class="icon-btn" id="b-queue" aria-label="Up Next" data-icon="queue"></button>
       </div>
-      <div class="p-bar"><span id="t-cur">0:00</span><div class="bar" id="bar"><div class="fill" id="fill"></div></div><span id="t-total">0:00</span></div>
+      <div class="p-bar">
+        <span class="time" id="t-cur" aria-label="Elapsed">0:00</span>
+        <div class="bar" id="bar" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0:00"><div class="fill" id="fill"></div></div>
+        <span class="time" id="t-total" aria-label="Remaining">-0:00</span>
+      </div>
+    </div>
+    <div class="p-right">
+      <button class="icon-btn" id="b-mute" aria-label="Mute"></button>
+      <input type="range" class="vol" id="vol" min="0" max="100" value="80" aria-label="Volume">
+      <button class="icon-btn" id="b-queue" aria-label="Up Next" data-icon="list"></button>
     </div>
   </footer>
 </div>
 
-<section class="np" id="np" aria-hidden="true">
+<section class="np" id="np" aria-hidden="true" aria-label="Now playing">
   <button class="icon-btn np-close" id="np-close" aria-label="Close Now Playing" data-icon="chev"></button>
   <div class="np-main">
-    <div class="np-art-wrap"><div class="np-art" id="np-art"></div></div>
+    <div class="np-art-wrap"><div class="cover np-art" id="np-art"></div></div>
     <div class="np-info">
       <div class="np-titles"><div><div class="np-title" id="np-title"></div><div class="np-artist" id="np-artist"></div></div><button class="icon-btn" id="np-like" aria-label="Like"></button></div>
-      <div class="p-bar big"><span id="np-cur">0:00</span><div class="bar" id="np-bar"><div class="fill" id="np-fill"></div></div><span id="np-total">0:00</span></div>
+      <div class="p-bar big">
+        <span class="time" id="np-cur">0:00</span>
+        <div class="bar" id="np-bar" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><div class="fill" id="np-fill"></div></div>
+        <span class="time" id="np-total">-0:00</span>
+      </div>
       <div class="np-controls">
-        <button class="icon-btn" id="np-repeat" aria-label="Repeat" data-icon="repeat"></button>
+        <button class="icon-btn" id="np-shuffle" aria-label="Shuffle" aria-pressed="false" data-icon="shuffle"></button>
+        <button class="icon-btn" id="np-repeat" aria-label="Repeat all" data-icon="repeat"></button>
         <button class="icon-btn" id="np-prev" aria-label="Previous" data-icon="prev"></button>
         <button class="play-btn lg" id="np-play" aria-label="Play"></button>
         <button class="icon-btn" id="np-next" aria-label="Next" data-icon="next"></button>
-        <button class="icon-btn" id="np-queue" aria-label="Up Next" data-icon="queue"></button>
+        <button class="icon-btn" id="np-queue" aria-label="Up Next" data-icon="list"></button>
       </div>
     </div>
   </div>
 </section>
 
+<input type="file" id="file-input" accept="audio/*" multiple hidden>
+
 <dialog id="add-dialog">
   <form id="add-form" method="dialog">
-    <h3>Add a song</h3>
+    <h3>Insert a song manually</h3>
     <label>Title<input name="title" maxlength="49" required></label>
     <label>Artist<input name="artist" maxlength="49" required></label>
     <div class="two">
-      <label>Duration (sec)<input name="duration" type="number" min="1" max="3600" required></label>
+      <label>Duration (sec)<input name="duration" type="number" min="1" max="86400" required></label>
       <label>Position<input name="pos" type="number" min="1" placeholder="end"></label>
     </div>
-    <div class="dlg-actions"><button type="button" class="text-btn" id="add-cancel">Cancel</button><button class="grad-btn">Add</button></div>
+    <div class="dlg-actions"><button type="button" class="btn-ghost" id="add-cancel">Cancel</button><button class="btn-primary">Add</button></div>
   </form>
 </dialog>
 
+<dialog id="name-dialog">
+  <form id="name-form" method="dialog">
+    <h3 id="name-title">New playlist</h3>
+    <label>Name<input id="name-input" maxlength="40" autocomplete="off" required></label>
+    <div class="dlg-actions"><button type="button" class="btn-ghost" id="name-cancel">Cancel</button><button value="ok" class="btn-primary" id="name-ok">Create</button></div>
+  </form>
+</dialog>
+
+<dialog id="pick-dialog">
+  <h3 id="pick-title">Add songs</h3>
+  <div class="pick-list" id="pick-list"></div>
+  <div class="dlg-actions"><button type="button" class="btn-ghost" id="pick-cancel">Cancel</button><button type="button" class="btn-primary" id="pick-ok">Add</button></div>
+</dialog>
+
 <div class="menu glass" id="menu" hidden></div>
-<div class="toast glass" id="toast"></div>
+<div class="toast glass" id="toast" role="status" aria-live="polite"></div>
+<script src="meta.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

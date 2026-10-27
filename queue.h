@@ -20,6 +20,7 @@ int  cq_isFull(const CircularQueue *q);
 int  cq_enqueue(CircularQueue *q, Song s);
 int  cq_dequeue(CircularQueue *q, Song *out);
 int  cq_size(const CircularQueue *q);
+int  cq_removeAt(CircularQueue *q, int i, Song *out);   /* i = 0 is the front */
 void cq_display(const CircularQueue *q);
 
 /* ---- Priority queue: higher priority leaves first, FIFO among equals ---- */
@@ -41,6 +42,7 @@ int  pq_isEmpty(const PriorityQueue *q);
 int  pq_isFull(const PriorityQueue *q);
 int  pq_enqueue(PriorityQueue *q, Song s, int priority);
 int  pq_dequeue(PriorityQueue *q, Song *out);
+int  pq_removeAt(PriorityQueue *q, int i, Song *out);
 void pq_display(const PriorityQueue *q);
 
 /* ---- Deque (double-ended queue): insert/delete at both ends ---- */
@@ -57,6 +59,7 @@ int  dq_insertFront(Deque *d, Song s);
 int  dq_insertRear(Deque *d, Song s);
 int  dq_deleteFront(Deque *d, Song *out);
 int  dq_deleteRear(Deque *d, Song *out);
+int  dq_removeAt(Deque *d, int i, Song *out);
 void dq_display(const Deque *d);
 
 /* ---- Linked-list queue: front/rear pointers, no size limit ---- */
@@ -76,6 +79,7 @@ int  lq_isEmpty(const LinkedQueue *q);
 int  lq_enqueue(LinkedQueue *q, Song s);
 int  lq_dequeue(LinkedQueue *q, Song *out);
 int  lq_size(const LinkedQueue *q);
+int  lq_removeAt(LinkedQueue *q, int i, Song *out);
 void lq_display(const LinkedQueue *q);
 void lq_free(LinkedQueue *q);
 

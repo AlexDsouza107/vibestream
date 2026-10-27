@@ -45,12 +45,37 @@ Node server (server.js)
 C engine (engine.c) -> playlist.c, liked.c, stack.c, queue.c
 ```
 
-In the UI: a frosted-glass, Apple Music-style layout (sidebar, song list, floating player). The background glow
-recolours itself to match the current song. Click the player's artwork for the full-screen Now Playing view;
-double-click a song to play it; the `•••` menu has Play next, Add to queue, Save to Liked Songs and Delete.
-"Up Next" opens a slide-in drawer showing what plays next. Space = play/pause, click a progress bar to seek.
-Playback is simulated (no audio) - when a song "ends" the app asks the C engine for the next one.
-The "Array mode / Linked list mode" button in the sidebar switches the history stack and queue implementation.
+In the UI: an obsidian, frosted-glass layout with minimal outline icons, a copper accent taken from the VibeStream logo, a mesh
+gradient behind the playlist header, and a light/dark switch (sun/moon, top right).
+
+**Playlists and shuffle**
+- **Create playlists** with the `+` next to *Library*. Add songs from the playlist's *Add songs* button, from the `•••` menu on any
+  song (*Add to playlist*), or by uploading files while the playlist is open. Rename or delete from the playlist page.
+  Each playlist is its own **doubly linked list**; the main *VibeStream Mix* is the library of all songs.
+- **Shuffle** is on the Play row of every list (Mix, Liked Songs, your playlists) and in the player bar. When it is on, the list
+  you are playing is Fisher-Yates shuffled into a **linked-list queue** and consumed one song at a time, so every song plays once
+  before any repeats. With Repeat All on, it reshuffles when the queue runs out.
+- Play always continues *inside the list you started from* (Mix, Liked Songs or a playlist), after anything in Up Next.
+
+**Up Next (the queue)** - open it with the queue button. It shows everything queued as one list:
+- **Reorder** by dragging a song (a line shows where it will land) or with the keyboard: focus the grip, press Arrow Up/Down.
+- **Remove** a song with its `×`, **Clear** the lot, or **Add songs** from a picker. *Play next* songs sit at the top.
+- Under the hood the queue is the priority queue (Play next) + deque + circular/linked queue. Removing a song edits just that
+  structure; reordering rebuilds them (Play next entries keep their label only while they stay at the top). In array mode each
+  queue holds at most 10 songs; switch to linked-list mode (sidebar) for more.
+- Below the queue, *Next from ...* previews what the current list will play.
+
+**Playing your own music:** press **Add song** (or drag audio files onto the song list) to add MP3 / M4A / WAV / OGG / FLAC files.
+- Each file becomes a normal library entry, so queue, Play next, like, playlists etc. all work.
+- Title and artist come from the file's ID3 tags (`web/meta.js` reads them, plus embedded cover art); otherwise from the
+  file name (`Artist - Title.mp3`, else artist = "Local Track"). Duration is read from the file itself.
+- Playback uses one HTML5 `<audio>` element: play/pause, seek (click, drag or arrow keys on the bar), volume, previous/next,
+  and auto-advance. Songs without a file (the 8 samples, or "Insert manually") play on a silent simulated clock.
+- Files stay in your browser (`blob:` URLs, nothing is uploaded). Removing a track revokes its URL. Because the files are not
+  saved, reloading the page removes the uploaded tracks from the library.
+
+Other controls: click the player artwork for full-screen Now Playing; double-click a song to play it; Space = play/pause.
+"Insert manually" adds a song at a chosen position of the library list.
 
 ## How playback works
 

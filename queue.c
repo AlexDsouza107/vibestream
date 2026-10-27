@@ -31,6 +31,17 @@ int cq_dequeue(CircularQueue *q, Song *out) {
 
 int cq_size(const CircularQueue *q) { return q->count; }
 
+/* Remove the i-th element (0 = front): close the gap by shifting later elements forward. */
+int cq_removeAt(CircularQueue *q, int i, Song *out) {
+    if (i < 0 || i >= q->count) return 0;
+    *out = q->data[(q->front + i) % QUEUE_MAX];
+    for (int j = i; j < q->count - 1; j++)
+        q->data[(q->front + j) % QUEUE_MAX] = q->data[(q->front + j + 1) % QUEUE_MAX];
+    q->rear = (q->rear - 1 + QUEUE_MAX) % QUEUE_MAX;
+    q->count--;
+    return 1;
+}
+
 void cq_display(const CircularQueue *q) {
     if (cq_isEmpty(q)) { printf("  (empty)\n"); return; }
     for (int i = 0; i < q->count; i++) {
@@ -69,6 +80,14 @@ int pq_dequeue(PriorityQueue *q, Song *out) {
     if (pq_isEmpty(q)) return 0;
     *out = q->data[0].song;
     for (int i = 1; i < q->count; i++) q->data[i - 1] = q->data[i];
+    q->count--;
+    return 1;
+}
+
+int pq_removeAt(PriorityQueue *q, int i, Song *out) {
+    if (i < 0 || i >= q->count) return 0;
+    *out = q->data[i].song;
+    for (int j = i + 1; j < q->count; j++) q->data[j - 1] = q->data[j];
     q->count--;
     return 1;
 }
@@ -122,6 +141,15 @@ int dq_deleteRear(Deque *d, Song *out) {
     return 1;
 }
 
+int dq_removeAt(Deque *d, int i, Song *out) {
+    if (i < 0 || i >= d->count) return 0;
+    *out = d->data[(d->front + i) % QUEUE_MAX];
+    for (int j = i; j < d->count - 1; j++)
+        d->data[(d->front + j) % QUEUE_MAX] = d->data[(d->front + j + 1) % QUEUE_MAX];
+    d->count--;
+    return 1;
+}
+
 void dq_display(const Deque *d) {
     if (dq_isEmpty(d)) { printf("  (empty)\n"); return; }
     for (int i = 0; i < d->count; i++) {
@@ -162,6 +190,19 @@ int lq_dequeue(LinkedQueue *q, Song *out) {
 }
 
 int lq_size(const LinkedQueue *q) { return q->count; }
+
+/* Linked version: walk with a 'prev' pointer, then unlink the node. */
+int lq_removeAt(LinkedQueue *q, int i, Song *out) {
+    if (i < 0 || i >= q->count) return 0;
+    QNode *prev = NULL, *c = q->front;
+    for (int j = 0; j < i; j++) { prev = c; c = c->next; }
+    *out = c->song;
+    if (prev) prev->next = c->next; else q->front = c->next;
+    if (c == q->rear) q->rear = prev;
+    free(c);
+    q->count--;
+    return 1;
+}
 
 void lq_display(const LinkedQueue *q) {
     if (lq_isEmpty(q)) { printf("  (empty)\n"); return; }

@@ -45,8 +45,8 @@ Node server (server.js)
 C engine (engine.c) -> playlist.c, liked.c, stack.c, queue.c
 ```
 
-In the UI: a dark, editorial layout (sidebar, song list, docked player) with a single champagne accent. The page picks up a faint tint
-of the current song's colour. Click the player's artwork for the full-screen Now Playing view;
+In the UI: a frosted-glass, Apple Music-style layout (sidebar, song list, floating player). The background glow
+recolours itself to match the current song. Click the player's artwork for the full-screen Now Playing view;
 double-click a song to play it; the `•••` menu has Play next, Add to queue, Save to Liked Songs and Delete.
 "Up Next" opens a slide-in drawer showing what plays next. Space = play/pause, click a progress bar to seek.
 Playback is simulated (no audio) - when a song "ends" the app asks the C engine for the next one.
